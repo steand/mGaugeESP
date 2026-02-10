@@ -24,17 +24,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "Display.h"
 
-#include "btIconOn.h"
-#include "btIconOff.h"
-#include "warningIcon.h"
+#include "btIconOn_48x48.h"
+#include "btIconOff_48x48.h"
+#include "warningRed_24x24.h"
+#include "warningYellow_24x24.h"
 
 
 void Display::begin()
 {   
     
     _log("Display Begin");
+/*
+     delay(500);
+    digitalWrite(8, LOW);
+     delay(500);
+    digitalWrite(8, HIGH);
+     delay(500); */
+
     tft.init();
-    delay(500);
+   
     tft.setRotation(1);
     clear();
     _log("Display End Begin");
@@ -47,19 +55,17 @@ void Display::drawFrame(int x, int y)
   int x1=x+5;
   int x2=x+235;
   int xm=x+120;
-  tft.drawLine(x1,15,x2,15,TFT_WHITE);      //Horizontal
+  tft.drawLine(x1,15,x2,15,TFT_WHITE);    //Horizontal
+                                          // voltage
   tft.drawLine(x1,100,x2,100,TFT_WHITE);  //Horizontal
-  tft.drawLine(x1,155,x2,155,TFT_WHITE);  //Horizontal 
+                                          //current
+  tft.drawLine(x1,185,x2,185,TFT_WHITE);  //Horizontal 
+                                          // Power
+  tft.drawLine(x1,270,x2,270,TFT_WHITE);  //Horizontal 
 
-  tft.drawLine(x1,230,x2,230,TFT_WHITE);  //Horizontal 
-  tft.drawLine(x1,285,x2,285,TFT_WHITE);  //Horizontal 
+  tft.drawLine(x1,15,x1,270,TFT_WHITE);    //Vertikal
+  tft.drawLine(x2,15,x2,270,TFT_WHITE);    //Vertikal
 
-  tft.drawLine(x1,15,x1,285,TFT_WHITE);    //Vertikal
-  tft.drawLine(x2,15,x2,285,TFT_WHITE);    //Vertikal
-
-  tft.drawLine(xm,100,xm,155,TFT_WHITE);    //Vertikal
-  tft.drawLine(xm,230,xm,285,TFT_WHITE);    //Vertikal
-  
   
 
 }
@@ -74,32 +80,18 @@ void Display::drawChanel(int x, int y,String name)
   tft.setTextDatum(CC_DATUM);
   tft.drawString(" "+name+" ",x+120,y+15,2);
 
-  tft.setTextDatum(TL_DATUM);
-
-  tft.drawString("Umin",x+15,y+102,2);
-  tft.drawString("Umax",x+130,y+102,2);
-
   tft.setTextDatum(BR_DATUM);
  
   tft.drawString("V",x+215,y+90,4);
-  tft.drawString("V",x+110,y+145,2);
-  tft.drawString("V",x+225,y+145,2);
-
-
 
   tft.setTextColor(TFT_SKYBLUE,TFT_BLACK, true);
-
-   tft.setTextDatum(TL_DATUM);
-
-  tft.drawString("Imin",x+15,y+232,2);
-  tft.drawString("Imax",x+130,y+232,2);
-
-  tft.setTextDatum(BR_DATUM);
  
-  tft.drawString("A",x+215,y+220,4);
-  tft.drawString("A",x+110,y+275,2);
-  tft.drawString("A",x+225,y+275,2);
+  tft.drawString("A",x+215,y+175,4);
 
+  tft.setTextColor(TFT_GREEN,TFT_BLACK, true);
+ 
+  tft.drawString("A",x+215,y+260,4);
+ 
 
 
 }
@@ -121,9 +113,30 @@ void Display::printValue(int x, int y, float value, int font)
 void Display::clear()
 {
   tft.fillScreen(TFT_BLACK);
+  tft.setSwapBytes(true);
  
   drawChanel(0,0,"Chanel I");
   drawChanel(240,0,"Chanel II");
+
+
+   
+  tft.setTextDatum(CL_DATUM);
+  tft.setTextColor(TFT_YELLOW,TFT_BLACK, true);
+
+  
+  tft.drawString("Voltage overflow",130,300,2);
+  tft.pushImage(100,290,24,24,warningYellow_24x24);
+
+  
+
+  tft.setTextColor(TFT_SKYBLUE,TFT_BLACK, true);
+
+  tft.drawString("Current overflow",330,300,2);
+  
+  tft.pushImage(300,290,24,24,warningRed_24x24);
+
+  
+
 
   btConnected(false);
   for (int i=0;i<2;i++) {
@@ -146,27 +159,16 @@ void Display::updateVoltage(int chanel, float voltage, bool overload)
 
   tft.setTextColor(TFT_YELLOW, TFT_BLACK, true);
 
-  if (!overload)
+  printValue(x + 15, 85, voltage, 7);
+  
+  if (overload)
   {
-
-    printValue(x + 15, 85, voltage, 7);
-
-    if (voltage < minVoltage[chanel])
-    {
-      minVoltage[chanel] = voltage;
-      printValue(10 + x, 150, minVoltage[chanel], 4);
-    }
-
-    if (voltage > maxVoltage[chanel])
-    {
-      maxVoltage[chanel] = voltage;
-      printValue(125 + x, 150, maxVoltage[chanel], 4);
-    }
+    tft.pushImage(x + 200, 23, 24, 24, warningYellow_24x24);
+ //   tft.pushImage(100,290,24,24,warningYellow_24x24);
   }
   else
   {
-    printValue(x + 15, 85, 99.999 , 7);
-    tft.pushImage(x + 200, 23, 24, 24, warningIcon);
+    tft.drawRect(x + 200, 23, 24, 24,TFT_BLACK);
   }
 }
 
@@ -180,36 +182,26 @@ void Display::updateCurrent(int chanel, float current, bool overload)
     x = 240;
 
   tft.setTextColor(TFT_SKYBLUE, TFT_BLACK, true);
+  printValue(x + 15, 170, current, 7);
 
-  if (!overload)
+  if (overload)
   {
-    printValue(x + 15, 215, current, 7);
-
-    if (current < minCurrent[chanel])
-    {
-      minCurrent[chanel] = current;
-      printValue(x + 10, 280, minCurrent[chanel], 4);
-    }
-
-    if (current > maxCurrent[chanel])
-    {
-      maxCurrent[chanel] = current;
-      printValue(x + 125, 280, maxCurrent[chanel], 4);
-    }
+   tft.pushImage(x + 200, 108, 24, 24, warningRed_24x24);
+  //  tft.pushImage(300,290,24,24,warningRed_24x24);
   }
   else
   {
-    printValue(x + 15, 215, 9.999, 7);
-    tft.pushImage(x + 200, 163, 24, 24, warningIcon);
+    tft.drawRect(x + 200, 108, 24, 24,TFT_BLACK);
+    
   }
 }
 
 void Display::btConnected(boolean conect)
 {
-  tft.setSwapBytes(true);
+ //  tft.setSwapBytes(true);
   if (conect) {
-    tft.pushImage(100,290,32,32,btIconOn);
+    tft.pushImage(20,272,48,48,btIconOn_48x48);
   } else {
-    tft.pushImage(100,290,32,32,btIconOff);
+    tft.pushImage(20,272,48,48,btIconOff_48x48);
   }
 }

@@ -26,9 +26,11 @@ void setup()
 {
   // Wire.begin(8,9);
   _log_begin(115200);  
-  delay(2000);
+   delay(2000);
    pinMode(LED_BUILTIN, OUTPUT);
+   pinMode(8, OUTPUT);
    digitalWrite(LED_BUILTIN, LOW);
+
   _log("Start BLE Server <ESPTestBLE>...");
   server.start("ESPTestBLE");
   _log("Start Service <INA219>...");
@@ -78,7 +80,6 @@ void loop()
     display.updateVoltage(1,float(random(2000,24500)) / 1000.0,true);
     display.updateCurrent(1, float(random(-3600,3000)) / 1000.0,true);
 
-     digitalWrite(LED_BUILTIN, HIGH);
     if (server.isConnected())
     { 
       if (!conected) {
