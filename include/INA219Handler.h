@@ -27,8 +27,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <Wire.h>
 #include "INA219_WE.h"
 
-// #define SDA 45
-// #define SDC 48
+#define SDA_PIN 36
+#define SDC_PIN 35
 
 class INA219Handler
 {
