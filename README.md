@@ -26,7 +26,7 @@ with a maximum power rating of 35W (1-25V, 0-5A)
 Qt PC software for displaying and recording measurement data
 
 - Plotting of measured values
-- Saving measured values ​​as *.csv files.
+- Saving measured values as *.csv files.
 
-Code is available in the `mGaugeGUI` repository.
+Code is available in the  [mGaugeGUI](https://github.com/steand/mGaugeGUI) repository.
 

@@ -4,3 +4,6 @@
 .vscode/launch.json
 .vscode/ipch
 *-backups/
+*auto_saved_files#
+_autosave-schematic.kicad_pcb
+*.lck
