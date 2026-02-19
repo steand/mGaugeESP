@@ -22,7 +22,7 @@ public:
     void start(const char * name);
     void startAdvertising();
     void send(String msg);
-    void sendSt(uint8_t *data, size_t len);
+    void send(uint8_t *data, size_t len);
     boolean isConnected();
 
 private:

@@ -27,34 +27,28 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <Wire.h>
 #include "INA219_WE.h"
 
+#include "APIData.h"
+
+#define I2C_FREQ 400000
 #define SDA_PIN 36
 #define SDC_PIN 35
+#define INAx40_RESISTOR 0.100  // must calibrated
+#define INAx41_RESISTOR 0.100  // must calibrated
 
 class INA219Handler
 {
-    
 
 public:
-    struct ina219Struct {
-        float voltage;
-        float current;
-        float power;
-    } ;
 
     INA219Handler();
-    boolean readDevice();
-    float getVoltage();
-    float getCurrent();
-    String format();
-    ina219Struct getStruct();
+    void logDevice(int channel);
+    float getVoltage(int channel);
+    float getCurrent(int channel);
+    boolean getData(API_Data *data);
     void begin();
     
 private:
-   
-    float voltage;
-    float current;
-    ina219Struct inaStruct;
-    INA219_WE *ina219;
+    INA219_WE *ina219[2];
 
 };
 

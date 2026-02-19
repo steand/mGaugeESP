@@ -24,8 +24,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "Display.h"
 
-#include "btIconOn_48x48.h"
-#include "btIconOff_48x48.h"
+#include "btIconOn_40x40.h"
+#include "btIconOff_40x40.h"
+#include "fz35On_40x40.h"
+#include "fz35Off_40x40.h"
 #include "warningRed_24x24.h"
 #include "warningYellow_24x24.h"
 
@@ -33,19 +35,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 void Display::begin()
 {   
     
-    _log("Display Begin");
-/*
-     delay(500);
-    digitalWrite(8, LOW);
-     delay(500);
-    digitalWrite(8, HIGH);
-     delay(500); */
-
+    _logd("Display Begin");
     tft.init();
-   
     tft.setRotation(1);
     clear();
-    _log("Display End Begin");
+    fz35Connected(false);
+    btConnected(false);
+    _logd("Display End Begin");
 }
 
 void Display::drawFrame(int x, int y)
@@ -70,7 +66,7 @@ void Display::drawFrame(int x, int y)
 
 }
 
-void Display::drawChanel(int x, int y,String name) 
+void Display::drawchannel(int x, int y,String name) 
 {
 
   drawFrame(x,y);
@@ -90,7 +86,7 @@ void Display::drawChanel(int x, int y,String name)
 
   tft.setTextColor(TFT_GREEN,TFT_BLACK, true);
  
-  tft.drawString("A",x+215,y+260,4);
+  tft.drawString("W",x+218,y+260,4);
  
 
 
@@ -115,8 +111,8 @@ void Display::clear()
   tft.fillScreen(TFT_BLACK);
   tft.setSwapBytes(true);
  
-  drawChanel(0,0,"Chanel I");
-  drawChanel(240,0,"Chanel II");
+  drawchannel(0,0,"channel I");
+  drawchannel(240,0,"channel II");
 
 
    
@@ -124,37 +120,30 @@ void Display::clear()
   tft.setTextColor(TFT_YELLOW,TFT_BLACK, true);
 
   
-  tft.drawString("Voltage overflow",130,300,2);
-  tft.pushImage(100,290,24,24,warningYellow_24x24);
+  tft.drawString("out of range",230,300,2);
+  tft.pushImage(200,290,24,24,warningYellow_24x24);
 
   
 
-  tft.setTextColor(TFT_SKYBLUE,TFT_BLACK, true);
+  tft.setTextColor(TFT_RED,TFT_BLACK, true);
 
-  tft.drawString("Current overflow",330,300,2);
+  tft.drawString("overflow",360,300,2);
   
-  tft.pushImage(300,290,24,24,warningRed_24x24);
+  tft.pushImage(330,290,24,24,warningRed_24x24);
 
   
 
 
   btConnected(false);
-  for (int i=0;i<2;i++) {
-  maxVoltage[i] = 0.0;
-  minVoltage[i] = 30.0;
-  maxCurrent[i] = -5.0;
-  minCurrent[i] = 5.0;
-
-  }
   
 }
 
-void Display::updateVoltage(int chanel, float voltage, bool overload)
+void Display::updateVoltage(int channel, float voltage, bool overload)
 {
   int x;
 
   x = 0;
-  if (chanel == 1)
+  if (channel == 1)
     x = 240;
 
   tft.setTextColor(TFT_YELLOW, TFT_BLACK, true);
@@ -164,21 +153,20 @@ void Display::updateVoltage(int chanel, float voltage, bool overload)
   if (overload)
   {
     tft.pushImage(x + 200, 23, 24, 24, warningYellow_24x24);
- //   tft.pushImage(100,290,24,24,warningYellow_24x24);
   }
   else
   {
-    tft.drawRect(x + 200, 23, 24, 24,TFT_BLACK);
+    tft.fillRect(x + 200, 23, 24, 24,TFT_BLACK);
   }
 }
 
-void Display::updateCurrent(int chanel, float current, bool overload)
+void Display::updateCurrent(int channel, float current, bool overload)
 {
 
   int x;
 
   x = 0;
-  if (chanel == 1)
+  if (channel == 1)
     x = 240;
 
   tft.setTextColor(TFT_SKYBLUE, TFT_BLACK, true);
@@ -187,21 +175,64 @@ void Display::updateCurrent(int chanel, float current, bool overload)
   if (overload)
   {
    tft.pushImage(x + 200, 108, 24, 24, warningRed_24x24);
-  //  tft.pushImage(300,290,24,24,warningRed_24x24);
   }
   else
   {
-    tft.drawRect(x + 200, 108, 24, 24,TFT_BLACK);
+    tft.fillRect(x + 200, 108, 24, 24,TFT_BLACK);
     
   }
 }
 
-void Display::btConnected(boolean conect)
+
+
+void Display::updatePower(int channel, float power, bool overload)
 {
- //  tft.setSwapBytes(true);
-  if (conect) {
-    tft.pushImage(20,272,48,48,btIconOn_48x48);
-  } else {
-    tft.pushImage(20,272,48,48,btIconOff_48x48);
+  int x;
+
+  x = 0;
+  if (channel == 1)
+    x = 240;
+
+  tft.setTextColor(TFT_GREEN, TFT_BLACK, true);
+
+  printValue(x + 15, 255, power, 7);
+  if (overload)
+  {
+   tft.pushImage(x + 200, 193, 24, 24, warningYellow_24x24);
   }
+  else
+  {
+    tft.fillRect(x + 200, 108, 24, 24,TFT_BLACK);
+    
+  }
+
+}
+
+void Display::btConnected(boolean connect)
+{
+  if (connect) {
+    tft.pushImage(20,280,40,40,btIconOn_40x40);
+  } else {
+    tft.pushImage(20,280,40,40,btIconOff_40x40);
+  }
+}
+
+void Display::fz35Connected(boolean connect)
+{
+  if (connect) {
+    tft.pushImage(80,280,40,40,fz35On_40x40);
+  } else {
+    tft.pushImage(80,280,40,40,fz35Off_40x40);
+  }
+}
+
+void Display::drawData(API_Data *data)
+{
+  updateVoltage(0,data->ina0Voltage,data->inaState & API_STATE_INA0_VOLTAGE );
+  updateCurrent(0,data->ina0Current,data->inaState & API_STATE_INA0_CURRENT );
+  updatePower(0,data->ina0Power,data->inaState & API_STATE_INA0_POWER );
+
+  updateVoltage(1,data->ina1Voltage,data->inaState & API_STATE_INA1_VOLTAGE  );
+  updateCurrent(1,data->ina1Current,data->inaState & API_STATE_INA1_CURRENT );
+  updatePower(1,data->ina1Power,data->inaState & API_STATE_INA1_POWER );
 }

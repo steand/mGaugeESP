@@ -2779,7 +2779,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "MyKiCadLib:xy_FX35"
+		(symbol "MyKiCadLib:xy_fz35"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -2791,7 +2791,7 @@
 					)
 				)
 			)
-			(property "Value" "FX35"
+			(property "Value" "fz35"
 				(at 0.254 8.89 0)
 				(effects
 					(font
@@ -2826,7 +2826,7 @@
 					(hide yes)
 				)
 			)
-			(symbol "xy_FX35_1_1"
+			(symbol "xy_fz35_1_1"
 				(polyline
 					(pts
 						(xy 7.62 7.62) (xy 7.62 -10.16) (xy -7.62 -10.16) (xy -7.62 7.62) (xy 7.62 7.62)
@@ -7126,7 +7126,7 @@
 				)
 			)
 		)
-		(property "Value" "FX35"
+		(property "Value" "fz35"
 			(at 92.71 39.37 0)
 			(effects
 				(font
@@ -7614,7 +7614,7 @@
 		)
 	)
 	(symbol
-		(lib_id "MyKiCadLib:xy_FX35")
+		(lib_id "MyKiCadLib:xy_fz35")
 		(at 41.91 41.91 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -7631,7 +7631,7 @@
 				)
 			)
 		)
-		(property "Value" "FX35"
+		(property "Value" "fz35"
 			(at 41.91 31.75 0)
 			(effects
 				(font
@@ -9249,7 +9249,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "FX35"
+		(property "Value" "fz35"
 			(at 83.82 39.878 0)
 			(effects
 				(font

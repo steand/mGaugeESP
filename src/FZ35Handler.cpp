@@ -1,23 +1,51 @@
 #include "FZ35Handler.h"
 
-FZ35Handler::FZ35Handler()
+
+
+
+void FZ35Handler::begin()
 {
- voltage =5.5;
- current =2.0;
- capacity = 0.0;
- time = 0.0;
-} 
+    fxSerial.begin(9600,SERIAL_8N1, 16, 17);
+    voltage =5.5;
+    current =2.0;
+    capacity = 0.0;
+    time = 0.0;
+}
+
+void FZ35Handler::loop()
+{
+    char ch;
+        /*
+    fxSerial.write('r');
+    fxSerial.write('e');  
+    fxSerial.write('a');
+    fxSerial.write('d');  
+
+   fxSerial.write(13);
+    fxSerial.write(10);  
+*/
+
+
+    // fxSerial.flush();
+    
+    while (fxSerial.available() > 0){
+          ch = fxSerial.read();
+        _logd("fz35 : %d = %s",ch, String(ch));
+    }
+
+    
+}
 
 boolean FZ35Handler::readDevice()
 { 
     // Test data
     if ( voltage<= 0.0) voltage = 5.5;
-    fzStruct.voltage = voltage = voltage - 0.1;
+    voltage = voltage - 0.1;
     if ( current <= 0.0) current = 2.0;
-    fzStruct.current = current = current - 0.01; 
+    current = current - 0.01; 
     if ( capacity > 10.0 ) capacity = 1.0;
-    fzStruct.capacity = capacity = capacity + 0.02;
-    fzStruct.time = time + 0.001;
+    capacity = capacity = capacity + 0.02;
+    time = time + 0.001;
     return true;
 }
 
@@ -36,15 +64,11 @@ float FZ35Handler::getCapcity()
     return capacity;
 }
 
-FZ35Handler::fz35Struct FZ35Handler::getStruct()
+boolean FZ35Handler::getData(API_Data *data)
 {
-    return fzStruct;
-}
-
-String FZ35Handler::format()
-{
-   
-   
-    String s = "#FZ35,"+String(voltage,3) + "," + String(current,3) + "," + String(capacity,3);
-    return s;
+    data->fz35Voltage = voltage;
+    data->fz35Current = current;
+    data->fz35Capacity = capacity;
+    data->fz35DischargeTime = time;
+    return true;
 }

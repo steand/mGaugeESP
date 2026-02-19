@@ -23,33 +23,30 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define _FZ35HANDLER_H_
 #include <Arduino.h>
 #include "Logging.h"
+#include <HardwareSerial.h>
+#include <APIData.h>
+
 
 class FZ35Handler
 {
 public:
-    struct fz35Struct {
-        float voltage;
-        float current;
-        float capacity;
-        float time;
-    } ;
-
-    FZ35Handler();
+    
+    FZ35Handler() : fxSerial(1) {} ;
+    void begin();
+    void loop();
     boolean readDevice();
     float getVoltage();
     float getCurrent();
     float getCapcity();
-    fz35Struct getStruct();
-    String format();
+    boolean getData(API_Data *data);
 
 
 private:
+    HardwareSerial fxSerial;
     float voltage;
     float current;
     float capacity;
     float time;
-    fz35Struct fzStruct;
-
 };
 
 #endif

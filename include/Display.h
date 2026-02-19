@@ -29,6 +29,8 @@
 #include "SPI.h"
 #include <TFT_eSPI.h> // Hardware-specific library
 
+#include "APIData.h"
+
 
 
  
@@ -37,23 +39,20 @@ class Display {
 private:
    TFT_eSPI tft;           // Invoke custom library
    void drawFrame(int x, int y);
-   void drawChanel(int x, int y, String name);
+   void drawchannel(int x, int y, String name);
    void printValue(int x, int y, float value, int font);
-   float maxVoltage[2];
-   float minVoltage[2];
-   float oldVoltage[2];
-   float maxCurrent[2];
-   float minCurrent[2];
+   void updateVoltage(int channel,float voltage,bool overload=false);
+   void updateCurrent(int channel,float current,bool overload=false);
+   void updatePower(int channel,float power,bool overload=false);
+  
    
    
 public:
 	void begin();
    void clear();
-   void updateVoltage(int chanel,float voltage,bool overload=false);
-   void updateCurrent(int chanel,float current,bool overload=false);
-   void btConnected(boolean conect = false);
-   
-
+   void btConnected(boolean connect = false);
+   void fz35Connected(boolean connect = false);
+   void drawData(API_Data *data);
 };
 
 

@@ -74,7 +74,7 @@ void BTHandler::send(String msg){
 
 }
 
-void BTHandler::sendSt(uint8_t *data, size_t len)
+void BTHandler::send(uint8_t *data, size_t len)
 {
     if (callback->isConnected()) {
         _logd("Send ->  Struct ");

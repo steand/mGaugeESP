@@ -18,7 +18,7 @@ Es wurde ein ESP32-S3 gewählt da er BLE 5.0 unterstützt und damit eine sichere
   - Strom: 0..3.2A
   - Leistung: 0..83.2W
   - Anzeige 3.5" LCD für Strom und Spannung
-- xy-FX35 als elektronischer Widertand
+- xy-fz35 als elektronischer Widertand
   mit einer Leistung von maximal 35W (1..25V, 0..5A)
 
 ### GUI

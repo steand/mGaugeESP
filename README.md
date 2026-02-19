@@ -17,7 +17,7 @@ The ESP32-S3 was chosen because it supports BLE 5.0, ensuring a secure connectio
 - Current: 0-3.2A
 - Power: 0-83.2W
 - 3.5" LCD display for current and voltage
-- xy-FX35 as an electronic resistor
+- xy-fz35 as an electronic resistor
 
 with a maximum power rating of 35W (1-25V, 0-5A)
 

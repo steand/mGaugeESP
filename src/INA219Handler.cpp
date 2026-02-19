@@ -12,24 +12,38 @@ void INA219Handler::begin()
 {
 
     
-   // Wire.begin(45,3);
-    ina219 = new INA219_WE(0x40);
+    Wire.begin(SDA_PIN,SDC_PIN);
+    ina219[0] = new INA219_WE(0x40);
+    ina219[0]->setShuntSizeInOhms(INAx40_RESISTOR);
+    ina219[0]->setPGain(INA219_PG_320);
+    ina219[0]->setBusRange(INA219_BRNG_32);
+    ina219[0]->setMeasureMode(INA219_CONTINUOUS);
 
-    if (!ina219->init())
+    ina219[1] = new INA219_WE(0x41);
+    ina219[1]->setShuntSizeInOhms(INAx41_RESISTOR);
+    ina219[1]->setPGain(INA219_PG_320);
+    ina219[1]->setBusRange(INA219_BRNG_32);
+    ina219[1]->setMeasureMode(INA219_CONTINUOUS);
+
+    if (!ina219[0]->init())
     {
-        _log("Failed to find INA219 chip");
+        _log("Failed to find INA219 chip fpr 0x40");
+    }
+    
+     if (!ina219[1]->init())
+    {
+        _log("Failed to find INA219 chip fpr 0x41");
     }
 }
 
 int l;
 
-boolean INA219Handler::readDevice()
+void INA219Handler::logDevice(int channel)
 {
     /* Test data
-    inaStruct.voltage = sin(float(l)* DEG_TO_RAD)*3.0;
-    if (l++>180) l=0;
-    inaStruct.current = float(random(2000,3000))/1000; 
-    inaStruct.power = inaStruct.voltage * inaStruct.current;
+   
+        log inaData
+
     */
 
   float shuntVoltage_mV = 0.0;
@@ -39,52 +53,64 @@ boolean INA219Handler::readDevice()
   float power_mW = 0.0; 
   bool ina219_overflow = false;
   
-  shuntVoltage_mV = ina219->getShuntVoltage_mV();
-  busVoltage_V = ina219->getBusVoltage_V();
-  current_mA = ina219->getCurrent_mA();
-  power_mW = ina219->getBusPower();
+  shuntVoltage_mV = ina219[channel]->getShuntVoltage_mV();
+  busVoltage_V = ina219[channel]->getBusVoltage_V();
+  current_mA = ina219[channel]->getCurrent_mA();
+  power_mW = ina219[channel]->getBusPower();
   loadVoltage_V  = busVoltage_V + (shuntVoltage_mV/1000);
-  ina219_overflow = ina219->getOverflow();
+  ina219_overflow = ina219[channel]->getOverflow();
+
+  _logd("channel: %d ",channel); 
   
-  Serial.print("Shunt Voltage [mV]: "); Serial.println(shuntVoltage_mV);
-  Serial.print("Bus Voltage [V]: "); Serial.println(busVoltage_V);
-  Serial.print("Load Voltage [V]: "); Serial.println(loadVoltage_V);
-  Serial.print("Current[mA]: "); Serial.println(current_mA);
-  Serial.print("Bus Power [mW]: "); Serial.println(power_mW);
+  _logd("Shunt Voltage [mV]: %f",shuntVoltage_mV);
+  _logd("Bus Voltage [V]: %f",busVoltage_V);
+  _logd("Load Voltage [V]: %f",loadVoltage_V);
+  _logd("Current[mA]: %f",current_mA);
+  _logd("Bus Power [mW]: %f",power_mW);
   if(!ina219_overflow){
-    Serial.println("Values OK - no overflow");
+    _logd("Values OK - no overflow");
   }
   else{
-    Serial.println("Overflow! Choose higher shunt voltage range or a smaller shunt.");
+    _loge("Overflow! Choose higher shunt voltage range or a smaller shunt.");
   }
-  Serial.println();
-
-    return true;
 }
 
-float INA219Handler::getVoltage()
+float INA219Handler::getVoltage(int channel)
 {
-    return ina219->getBusVoltage_V();;
+    return ina219[channel]->getBusVoltage_V();;
 }
 
-float INA219Handler::getCurrent()
+float INA219Handler::getCurrent(int channel)
 {
-    return ina219->getCurrent_mA() / 1000.0;
+    return ina219[channel]->getCurrent_mA() / 1000.0;
 }
 
-String INA219Handler::format()
+
+boolean INA219Handler::getData(API_Data *data )
 {
-    
    
-    String s = "#INA219,"+String(voltage,3) + "," + String(current,3);
-    return s;
-}
+    data->ina0Voltage = ina219[0]->getBusVoltage_V();
+    data->ina0Current  = ina219[0]->getCurrent_mA() / 1000.0; 
+    data->ina0Power    = ina219[0]->getBusPower()/1000.0;
+    //* Test Data
+    data->ina0Voltage = 27.0;
+    data->ina0Current  = 3.3;
+    data->ina0Power    = ina219[0]->getBusPower()/1000.0;
+    
+    data->inaState = 0;
+    if (data->ina0Voltage >= 26.0) data->inaState = data->inaState | API_STATE_INA0_VOLTAGE | API_STATE_INA0_POWER;
+    if (data->ina0Current  >= 3.2)  data->inaState = data->inaState | API_STATE_INA0_CURRENT | API_STATE_INA0_POWER;
+    if (ina219[0]->getOverflow())   data->inaState = data->inaState | API_STATE_INA0_OVERFLOW;
 
-INA219Handler::ina219Struct INA219Handler::getStruct()
-{
-    inaStruct.voltage = ina219->getBusVoltage_V();
-    inaStruct.current = ina219->getCurrent_mA() / 1000.0;
-    inaStruct.power  = ina219->getBusPower()/1000.0;
-    return inaStruct;
+    data->ina1Voltage = ina219[1]->getBusVoltage_V();
+    data->ina1Current  = ina219[1]->getCurrent_mA() / 1000.0; 
+    data->ina1Power    = ina219[1]->getBusPower()/1000.0;
+
+    if (data->ina1Voltage >= 26.0) data->inaState = data->inaState | API_STATE_INA1_VOLTAGE | API_STATE_INA1_POWER;
+    if (data->ina1Current  >= 3.2)  data->inaState = data->inaState | API_STATE_INA1_CURRENT | API_STATE_INA1_POWER;
+    if (ina219[0]->getOverflow())   data->inaState = data->inaState | API_STATE_INA1_OVERFLOW;
+
+
+    return (ina219[0]->getOverflow() || ina219[1]->getOverflow());
 }
 
