@@ -13,9 +13,7 @@
 
 
 
-BTHandler::BTHandler(){
-
-   
+BTHandler::BTHandler(){ 
 }
 
 void BTHandler::start(const char *name)
@@ -47,7 +45,7 @@ void BTHandler::start(const char *name)
   // Start the service
   pService->start();
 
-  // Start advertising
+  // Config advertising and start it
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->setScanResponse(false);
@@ -77,7 +75,7 @@ void BTHandler::send(String msg){
 void BTHandler::send(uint8_t *data, size_t len)
 {
     if (callback->isConnected()) {
-        _logd("Send ->  Struct ");
+        // _logd("Send ->  Struct ");
         pCharacteristic->setValue(data,len);
         pCharacteristic->notify();
     } else {

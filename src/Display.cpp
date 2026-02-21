@@ -31,10 +31,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "warningRed_24x24.h"
 #include "warningYellow_24x24.h"
 
+Display::Display()
+{
+  // this->tft = tft;
+}
 
 void Display::begin()
 {   
-    
     _logd("Display Begin");
     tft.init();
     tft.setRotation(1);

@@ -26,6 +26,7 @@
 #define _DISPLAY_H
 #include "Arduino.h"
 #include "Logging.h"
+
 #include "SPI.h"
 #include <TFT_eSPI.h> // Hardware-specific library
 
@@ -48,6 +49,7 @@ private:
    
    
 public:
+   Display();
 	void begin();
    void clear();
    void btConnected(boolean connect = false);

@@ -30,8 +30,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "APIData.h"
 
 #define I2C_FREQ 400000
-#define SDA_PIN 36
-#define SDC_PIN 35
+#define SDA_PIN 2
+#define SDC_PIN 1
 #define INAx40_RESISTOR 0.100  // must calibrated
 #define INAx41_RESISTOR 0.100  // must calibrated
 

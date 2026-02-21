@@ -22,16 +22,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define _API_DATA_H_
 #include <Arduino.h>
 
-/*
-  ina#State:
-    0b10000000 : Data not avalible
-    0b00000001 : Voltage out of range
-    0b00000010 : current overflow
-    0b00000001 : Power out of range
-
-  fz35State:
-    0b00000001 : Data not avalible
-*/
 
 #define API_STATE_INA0_VOLTAGE  0b00000001 
 #define API_STATE_INA0_CURRENT  0b00000010 
@@ -44,6 +34,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define API_STATE_fz35_START    0b00000001
 
 struct  API_Data {
+    // order are nessery for 16, 32 & 64 bit memory architekture
+    // do not change !!!
  
  float   ina0Voltage;          // byte 0..3
  float   ina0Current;           // byte 4..7

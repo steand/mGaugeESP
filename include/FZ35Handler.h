@@ -26,6 +26,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <HardwareSerial.h>
 #include <APIData.h>
 
+#define FZ35_RxT_PIN 4
+#define FZ35_TxT_PIN 5
+
 
 class FZ35Handler
 {
@@ -33,11 +36,13 @@ public:
     
     FZ35Handler() : fxSerial(1) {} ;
     void begin();
+    void start();
+    void stop();
     void loop();
-    boolean readDevice();
     float getVoltage();
     float getCurrent();
     float getCapcity();
+    int getTime();
     boolean getData(API_Data *data);
 
 
@@ -46,7 +51,10 @@ private:
     float voltage;
     float current;
     float capacity;
-    float time;
+    int time;
+    int pos;
+
+    String inStr;
 };
 
 #endif
