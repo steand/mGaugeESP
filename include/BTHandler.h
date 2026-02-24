@@ -13,6 +13,8 @@
 #include <BLE2902.h>
 #include "ServerCallback.h"
 
+#include "Data.h"
+
 #include "Logging.h"
 
 class BTHandler
@@ -21,8 +23,7 @@ public:
     BTHandler();
     void start(const char * name);
     void startAdvertising();
-    void send(String msg);
-    void send(uint8_t *data, size_t len);
+    boolean send();
     boolean isConnected();
 
 private:
@@ -31,6 +32,9 @@ private:
     BLECharacteristic *pCharacteristic = NULL;
     bool deviceConnected = false;
     bool oldDeviceConnected = false;
+
+    API_Data data;
+
     uint32_t value = 0;
 };
 

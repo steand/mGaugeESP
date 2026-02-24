@@ -62,7 +62,7 @@ void __log_time(byte type, const char *filename,const char *function, int line);
 #undef _log_begin
 #define _loge(__log_x, ...) __log_time(_ERROR,__FILE__ , __func__ , __LINE__ );\
                            __SERIAL.printf( __log_x"\n" ,##__VA_ARGS__)
-#define _log_begin(__speed) delay(1000);\
+#define _log_begin(__speed) delay(3000);\
                              __SERIAL.begin(__speed);\
                              __log_time(_INFO,__FILE__ , __func__ , __LINE__ );\
                              __SERIAL.printf("Logging Start (%d)\r\n",__speed)

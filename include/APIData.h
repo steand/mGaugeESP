@@ -23,26 +23,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <Arduino.h>
 
 
-#define API_STATE_INA0_VOLTAGE  0b00000001 
-#define API_STATE_INA0_CURRENT  0b00000010 
-#define API_STATE_INA0_POWER    0b00000100 
-#define API_STATE_INA0_OVERFLOW 0b00001000
-#define API_STATE_INA1_VOLTAGE  0b00010000
-#define API_STATE_INA1_CURRENT  0b00100000 
-#define API_STATE_INA1_POWER    0b01000000 
-#define API_STATE_INA1_OVERFLOW 0b10000000
-#define API_STATE_fz35_START    0b00000001
+#define API_STATE_INA_VOLTAGE  0b00000001 
+#define API_STATE_INA_CURRENT  0b00000010 
+#define API_STATE_INA_POWER    0b00000100 
+#define API_STATE_INA_OVERFLOW 0b00001000
 
 struct  API_Data {
     // order are nessery for 16, 32 & 64 bit memory architekture
     // do not change !!!
  
- float   ina0Voltage;          // byte 0..3
- float   ina0Current;           // byte 4..7
- float   ina0Power;             // byte 8..11
- float   ina1Voltage;          // byte 12..15
- float   ina1Current;           // byte 16..19
- float   ina1Power;             // byte 20..23 
+ float   inaVoltage[2];          // byte 0..7
+ float   inaCurrent[2];           // byte 8..15
+ float   inaPower[2];             // byte 16..23
  float   fz35Voltage;          // byte 24..27
  float   fz35Current;           // byte 28..31
  float   fz35Capacity;          // byte 32..35
@@ -50,6 +42,14 @@ struct  API_Data {
  uint8_t  inaState;             // byte 38
  uint8_t  fz35State;            // byte 39
 };
+
+struct ConfigData_t {
+    boolean inaDisplay[2];
+    float inaResistor[2];
+};
+
+extern API_Data apiData;
+
 
   
 

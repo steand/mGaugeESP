@@ -31,12 +31,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "warningRed_24x24.h"
 #include "warningYellow_24x24.h"
 
-Display::Display()
+GDisplay::GDisplay()
 {
   // this->tft = tft;
 }
 
-void Display::begin()
+void GDisplay::begin()
 {   
     _logd("Display Begin");
     tft.init();
@@ -47,7 +47,7 @@ void Display::begin()
     _logd("Display End Begin");
 }
 
-void Display::drawFrame(int x, int y)
+void GDisplay::drawFrame(int x, int y)
 {
 
 
@@ -69,7 +69,7 @@ void Display::drawFrame(int x, int y)
 
 }
 
-void Display::drawchannel(int x, int y,String name) 
+void GDisplay::drawchannel(int x, int y,String name) 
 {
 
   drawFrame(x,y);
@@ -95,7 +95,7 @@ void Display::drawchannel(int x, int y,String name)
 
 }
 
-void Display::printValue(int x, int y, float value, int font)
+void GDisplay::printValue(int x, int y, float value, int font)
 {
   int w;
   if (font == 7) w = 175;
@@ -109,13 +109,13 @@ void Display::printValue(int x, int y, float value, int font)
 }
 
 
-void Display::clear()
+void GDisplay::clear()
 {
   tft.fillScreen(TFT_BLACK);
   tft.setSwapBytes(true);
  
-  drawchannel(0,0,"channel I");
-  drawchannel(240,0,"channel II");
+  drawchannel(0,0,"channel 0");
+  drawchannel(240,0,"channel I");
 
 
    
@@ -141,7 +141,7 @@ void Display::clear()
   
 }
 
-void Display::updateVoltage(int channel, float voltage, bool overload)
+void GDisplay::updateVoltage(int channel, float voltage, bool overload)
 {
   int x;
 
@@ -163,7 +163,7 @@ void Display::updateVoltage(int channel, float voltage, bool overload)
   }
 }
 
-void Display::updateCurrent(int channel, float current, bool overload)
+void GDisplay::updateCurrent(int channel, float current, bool overload)
 {
 
   int x;
@@ -188,7 +188,7 @@ void Display::updateCurrent(int channel, float current, bool overload)
 
 
 
-void Display::updatePower(int channel, float power, bool overload)
+void GDisplay::updatePower(int channel, float power, bool overload)
 {
   int x;
 
@@ -211,7 +211,7 @@ void Display::updatePower(int channel, float power, bool overload)
 
 }
 
-void Display::btConnected(boolean connect)
+void GDisplay::btConnected(boolean connect)
 {
   if (connect) {
     tft.pushImage(20,280,40,40,btIconOn_40x40);
@@ -220,7 +220,7 @@ void Display::btConnected(boolean connect)
   }
 }
 
-void Display::fz35Connected(boolean connect)
+void GDisplay::fz35Connected(boolean connect)
 {
   if (connect) {
     tft.pushImage(80,280,40,40,fz35On_40x40);
@@ -229,13 +229,3 @@ void Display::fz35Connected(boolean connect)
   }
 }
 
-void Display::drawData(API_Data *data)
-{
-  updateVoltage(0,data->ina0Voltage,data->inaState & API_STATE_INA0_VOLTAGE );
-  updateCurrent(0,data->ina0Current,data->inaState & API_STATE_INA0_CURRENT );
-  updatePower(0,data->ina0Power,data->inaState & API_STATE_INA0_POWER );
-
-  updateVoltage(1,data->ina1Voltage,data->inaState & API_STATE_INA1_VOLTAGE  );
-  updateCurrent(1,data->ina1Current,data->inaState & API_STATE_INA1_CURRENT );
-  updatePower(1,data->ina1Power,data->inaState & API_STATE_INA1_POWER );
-}

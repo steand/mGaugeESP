@@ -2,20 +2,24 @@
 
 #include "Logging.h"
 
-#include "APIData.h"
+#include "Data.h"
 
 #include "BTHandler.h"
 #include "INA219Handler.h"
 #include "FZ35Handler.h"
 #include "Display.h"
+#include "Ky040.h"
 
 
-BTHandler server;
+GData Data;  // Global!!!
+GDisplay Display; // Global !!!
+
 INA219Handler ina219;
 FZ35Handler fz35;
-API_Data data;
-Display display;
 
+BTHandler server;
+
+Ky040 ky(15,6,7);
 
 void setup()
 {
@@ -24,9 +28,10 @@ void setup()
    pinMode(LED_BUILTIN, OUTPUT);
    digitalWrite(LED_BUILTIN, LOW);  // On Board RGB-LED off
 
-  _logd("Start BLE Server <ESPTestBLE>...");
-   server.start("ESPTestBLE");
+  _logd("Start Service Data...");
+   Data.begin();
 
+ 
   _logd("Start Service <INA219>...");
    ina219.begin();
 
@@ -34,7 +39,14 @@ void setup()
    fz35.begin();
 
    _logd("Start Service Display...");
-   display.begin(); 
+   Display.begin(); 
+
+   _logd("Start BLE Server <ESPTestBLE>...");
+   server.start("ESPTestBLE");
+
+   ky.begin();
+   ky.activateRotaries();
+
 }
 
 long timer1 = millis();
@@ -46,35 +58,35 @@ void loop()
   {
 
     timer1 = millis()-1;
-    ina219.getData(&data);
+    ina219.updateData();
     
     if (server.isConnected())
     {
       if (!conected)
       {
-        display.btConnected(true);
+        Display.btConnected(true);
         fz35.start();
-        display.fz35Connected(true);
+        Display.fz35Connected(true);
         conected = true;
         _log("Client conected");
       }
-
-      server.send((uint8_t *)&data, sizeof(data));
+      fz35.updateData();
+      server.send();
     }
     else
     {
       if (conected)
       {
-        display.btConnected(false);
+        Display.btConnected(false);
         fz35.stop();
-        display.fz35Connected(false);
+        Display.fz35Connected(false);
         conected = false;
         _log("Client disconected");
       }
     }
-    
-    display.drawData(&data);
+    _log("Rotary: %d",ky.getRotaries());
   }
   fz35.loop();
+  if (ky.buttonPressed()) {_log("Pressed");}
 }
 

@@ -12,9 +12,10 @@
 #define CHARACTERISTIC_UUID "eb99eb2b-048a-4fa7-a81f-4f62ca333f07"
 
 
-
-BTHandler::BTHandler(){ 
+BTHandler::BTHandler()
+{
 }
+
 
 void BTHandler::start(const char *name)
 { 
@@ -59,30 +60,6 @@ void BTHandler::startAdvertising()
    _log("Waiting a client connection to notify...");
 }
 
-
-void BTHandler::send(String msg){
-    if (callback->isConnected()) {
-        _logd("Send : %s",msg.c_str());
-        pCharacteristic->setValue(msg.c_str());
-        pCharacteristic->notify();
-    } else {
-        _loge("Try to send Data but Client not conneced. Data. %s",msg.c_str());
-    }
-
-
-}
-
-void BTHandler::send(uint8_t *data, size_t len)
-{
-    if (callback->isConnected()) {
-        // _logd("Send ->  Struct ");
-        pCharacteristic->setValue(data,len);
-        pCharacteristic->notify();
-    } else {
-        _loge("Try to send Data but Client not conneced. Data.");
-    }
-}
-
 boolean BTHandler::isConnected()
 {
     boolean connect = callback->isConnected();
@@ -97,3 +74,21 @@ boolean BTHandler::isConnected()
 
     return connect;
 }
+
+boolean BTHandler::send()
+
+{
+
+    if (callback->isConnected()) {
+        // _logd("Send ->  Struct ");
+        API_Data data = Data.getApiData();
+        pCharacteristic->setValue((uint8_t *)&data,sizeof(data));
+        pCharacteristic->notify();
+        return true;
+    } 
+
+    _loge("Try to send Data but Client not conneced. Data.");
+    return false;
+}
+
+

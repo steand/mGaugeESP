@@ -1,7 +1,7 @@
 #include "INA219Handler.h"
 
 
-// #define TESTDATA_ON
+#define TESTDATA_ON
 
 
 
@@ -43,11 +43,7 @@ int l;
 
 void INA219Handler::logDevice(int channel)
 {
-    /* Test data
-   
-        log inaData
-
-    */
+    // Test only for develop
 
   float shuntVoltage_mV = 0.0;
   float loadVoltage_V = 0.0;
@@ -78,58 +74,49 @@ void INA219Handler::logDevice(int channel)
   }
 }
 
-float INA219Handler::getVoltage(int channel)
+void INA219Handler::updateData()
 {
-    return ina219[channel]->getBusVoltage_V();;
-}
-
-float INA219Handler::getCurrent(int channel)
-{
-    return ina219[channel]->getCurrent_mA() / 1000.0;
-}
-
-
-boolean INA219Handler::getData(API_Data *data )
-{
-   
-
-#ifdef TESTDATA_ON
-    if (data->ina0Voltage <= 10.0F) data->ina0Voltage += 0.2F;
-    else data->ina0Voltage = 9.0F;
-    data->ina0Current  = 3.0;
-    data->ina0Power    = data->ina0Current * data->ina0Voltage;
-#else 
-    data->ina0Voltage = ina219[0]->getBusVoltage_V();
-    data->ina0Current  = ina219[0]->getCurrent_mA() / 1000.0; 
-    data->ina0Power    = ina219[0]->getBusPower()/1000.0;
-
-#endif
-
-
-    data->inaState = 0;
-    if (data->ina0Voltage >= 26.0) data->inaState = data->inaState | API_STATE_INA0_VOLTAGE | API_STATE_INA0_POWER;
-    if (data->ina0Current  >= 3.2)  data->inaState = data->inaState | API_STATE_INA0_CURRENT | API_STATE_INA0_POWER;
-    if (ina219[0]->getOverflow())   data->inaState = data->inaState | API_STATE_INA0_OVERFLOW;
-
-    
 #ifdef TESTDATA_ON
     static float f;
-    data->ina1Voltage = sin(f)*5.0F;
-    if ((f += 0.10F) > M_PI) f=0.0F;
-    data->ina1Current  = 2.1;
-    data->ina1Power    = data->ina1Voltage * data->ina1Current;
-#else
-    data->ina1Voltage = ina219[1]->getBusVoltage_V();
-    data->ina1Current  = ina219[1]->getCurrent_mA() / 1000.0; 
-    data->ina1Power    = ina219[1]->getBusPower()/1000.0;
 #endif
 
+    uint8_t state;
+    float voltage;
+    float current;
+    float power;
 
-    if (data->ina1Voltage >= 26.0) data->inaState = data->inaState | API_STATE_INA1_VOLTAGE | API_STATE_INA1_POWER;
-    if (data->ina1Current  >= 3.2)  data->inaState = data->inaState | API_STATE_INA1_CURRENT | API_STATE_INA1_POWER;
-    if (ina219[0]->getOverflow())   data->inaState = data->inaState | API_STATE_INA1_OVERFLOW;
+    for (int channel = 0; channel < 2; channel++)
+    {
 
+#ifdef TESTDATA_ON
 
-    return (ina219[0]->getOverflow() || ina219[1]->getOverflow());
+        voltage = sin(f) * 5.0F;
+        if ((f += 0.10F) > M_PI)
+            f = 0.0F;
+        current = 4.1F;
+        power = voltage * current;
+#else
+        voltage = ina219[0]->getBusVoltage_V();
+        current = ina219[0]->getCurrent_mA() / 1000.0;
+        power = ina219[0]->getBusPower() / 1000.0;
+
+#endif
+
+        Data.setInaBusVoltage(channel, voltage);
+        Data.setInaBusCurrent(channel, current);
+        Data.setInaBusPower(channel, power);
+
+        state = 0;
+        if (voltage >= 26.0)
+            state = state | API_STATE_INA_VOLTAGE | API_STATE_INA_POWER;
+        if (current >= 3.2)
+            state = state | API_STATE_INA_CURRENT | API_STATE_INA_POWER;
+        if (ina219[0]->getOverflow())
+            state = state | API_STATE_INA_OVERFLOW;
+        Data.setInaState(channel, state);
+
+        Display.updateVoltage(channel, voltage, state & API_STATE_INA_VOLTAGE);
+        Display.updateCurrent(channel, current, state & API_STATE_INA_CURRENT);
+        Display.updatePower(channel, power, state & API_STATE_INA_POWER);
+    }
 }
-

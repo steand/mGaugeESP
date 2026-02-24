@@ -1,6 +1,6 @@
 #include "FZ35Handler.h"
 
-// #define TESTDATA_ON
+#define TESTDATA_ON
 
 
 
@@ -77,47 +77,18 @@ void FZ35Handler::loop()
 }
 
 
-float FZ35Handler::getVoltage()
+boolean FZ35Handler::updateData()
 {
-    return voltage;
-}
-
-float FZ35Handler::getCurrent()
-{
-    return current;
-}
-
-float FZ35Handler::getCapcity()
-{
-    return capacity;
-}
-
-int FZ35Handler::getTime()
-{
-    return time;
-}
-
-boolean FZ35Handler::getData(API_Data *data)
-{
-     /* Test data
-    if ( voltage<= 0.0) voltage = 5.5;
-    voltage = voltage - 0.1;
-    if ( current <= 0.0) current = 2.0;
-    current = current - 0.01; 
-    if ( capacity > 10.0 ) capacity = 1.0;
-    capacity = capacity = capacity + 0.02;
-    time = time + 0.001;
-    */
-    data->fz35Voltage = voltage;
-    data->fz35Current = current;
-    data->fz35Capacity = capacity;
-    data->fz35DischargeTime = time;
+    Data.setFzVoltage(voltage);
+    Data.setFzCurrent(current);
+    Data.setFzCapacity(capacity);
+    Data.setFzTime(time);
 
 #ifdef TESTDATA_ON
-    data->fz35Voltage = 21.0;
-    data->fz35Current = 4.2;
-    data->fz35Capacity = 2.7;
-    data->fz35DischargeTime = 128;
+    Data.setFzVoltage(21.0);
+    Data.setFzCurrent(4.2);
+    Data.setFzCapacity(2.7);
+    Data.setFzTime(128);
 #endif
 
     return true;

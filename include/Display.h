@@ -30,32 +30,35 @@
 #include "SPI.h"
 #include <TFT_eSPI.h> // Hardware-specific library
 
-#include "APIData.h"
+#include "Data.h"
 
 
 
  
-class Display {
+class GDisplay {
 
 private:
    TFT_eSPI tft;           // Invoke custom library
    void drawFrame(int x, int y);
    void drawchannel(int x, int y, String name);
    void printValue(int x, int y, float value, int font);
-   void updateVoltage(int channel,float voltage,bool overload=false);
-   void updateCurrent(int channel,float current,bool overload=false);
-   void updatePower(int channel,float power,bool overload=false);
+   
   
    
    
 public:
-   Display();
+   GDisplay();
 	void begin();
    void clear();
    void btConnected(boolean connect = false);
    void fz35Connected(boolean connect = false);
-   void drawData(API_Data *data);
+   void updateVoltage(int channel,float voltage,bool overload=false);
+   void updateCurrent(int channel,float current,bool overload=false);
+   void updatePower(int channel,float power,bool overload=false);
+
+
 };
 
+extern GDisplay Display;
 
 #endif  // _DISPLAY_H

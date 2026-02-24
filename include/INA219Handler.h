@@ -27,13 +27,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <Wire.h>
 #include "INA219_WE.h"
 
-#include "APIData.h"
+#include "Data.h"
+#include "Display.h"
 
 #define I2C_FREQ 400000
 #define SDA_PIN 2
 #define SDC_PIN 1
-#define INAx40_RESISTOR 0.100  // must calibrated
-#define INAx41_RESISTOR 0.100  // must calibrated
+
 
 class INA219Handler
 {
@@ -41,14 +41,14 @@ class INA219Handler
 public:
 
     INA219Handler();
-    void logDevice(int channel);
-    float getVoltage(int channel);
-    float getCurrent(int channel);
-    boolean getData(API_Data *data);
+    void logDevice(int channel); // for test only
+    void updateData();
     void begin();
+
     
 private:
     INA219_WE *ina219[2];
+
 
 };
 

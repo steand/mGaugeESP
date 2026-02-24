@@ -24,7 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <Arduino.h>
 #include "Logging.h"
 #include <HardwareSerial.h>
-#include <APIData.h>
+#include <Data.h>
 
 #define FZ35_RxT_PIN 4
 #define FZ35_TxT_PIN 5
@@ -39,11 +39,7 @@ public:
     void start();
     void stop();
     void loop();
-    float getVoltage();
-    float getCurrent();
-    float getCapcity();
-    int getTime();
-    boolean getData(API_Data *data);
+    boolean updateData();
 
 
 private:
