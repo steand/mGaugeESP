@@ -1,12 +1,5 @@
 /*
-   Display.h - Header file for class "Display".
-
-   The Main-Display for MiniLab
-
-   Works for tft 480x320 and setRotation(1)
-   Implement for ESP32 (only)
-
-   Copyright (C) 2019  by Stefan Andres
+   Copyright (C) 2026  by Stefan Andres (develop@andres-stefan.de)
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -42,6 +35,8 @@ private:
    void drawFrame(int x, int y);
    void drawchannel(int x, int y, String name);
    void printValue(int x, int y, float value, int font);
+
+   uint8_t lastPos;
    
   
    
@@ -55,6 +50,11 @@ public:
    void updateVoltage(int channel,float voltage,bool overload=false);
    void updateCurrent(int channel,float current,bool overload=false);
    void updatePower(int channel,float power,bool overload=false);
+
+   void drawSetup();
+   void drawSetupResistor(uint8_t channel, float resistor, float current, boolean active = false);
+   void activatePos(uint8_t pos);
+   
 
 
 };

@@ -1,25 +1,19 @@
 /*
-Display.cpp - Implementation file for class "Display".
+   Copyright (C) 2026  by Stefan Andres (develop@andres-stefan.de)
 
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-Works for tft 480x320 and setRotation(0)
-Implement for ESP8266 (only)
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-Copyright (C) 2023  by Stefan Andres
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 
 #include "Display.h"
@@ -117,25 +111,14 @@ void GDisplay::clear()
   drawchannel(0,0,"channel 0");
   drawchannel(240,0,"channel I");
 
-
-   
   tft.setTextDatum(CL_DATUM);
   tft.setTextColor(TFT_YELLOW,TFT_BLACK, true);
-
-  
   tft.drawString("out of range",230,300,2);
   tft.pushImage(200,290,24,24,warningYellow_24x24);
 
-  
-
   tft.setTextColor(TFT_RED,TFT_BLACK, true);
-
   tft.drawString("overflow",360,300,2);
-  
   tft.pushImage(330,290,24,24,warningRed_24x24);
-
-  
-
 
   btConnected(false);
   
@@ -211,6 +194,44 @@ void GDisplay::updatePower(int channel, float power, bool overload)
 
 }
 
+void GDisplay::drawSetup()
+{
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK, true);
+  tft.setTextDatum(BL_DATUM);
+  tft.drawString("Setup INA219 Resistors",5,30,4);
+  tft.drawString("Channel 0:",20,70,4);
+  tft.drawString("Channel 1:",20,120,4);
+  tft.drawString("Save",20,170,4);
+  tft.drawString("Exit",20,220,4);
+}
+
+void GDisplay::drawSetupResistor(uint8_t channel, float resistor, float current, boolean active)
+{
+  String s;
+  int y = 70;
+  if (channel == 1 ) y = 120;
+  tft.setTextPadding(100);
+  tft.setTextDatum(BR_DATUM);
+  if (active) tft.setTextColor(TFT_YELLOW, TFT_BLACK, true);
+  s=String(resistor,3)+"Ohm";
+  tft.drawString(s,280,y,4);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK, true);
+  s=String(current,3)+"A";
+  tft.drawString(s,410,y,4);
+
+}
+
+void GDisplay::activatePos(uint8_t pos)
+{
+  int32_t x1,x2,x3,y1,y2,y3;
+  const uint8_t posd[] ={60,110,160,210};
+
+  tft.fillTriangle(5,posd[lastPos],5,posd[lastPos]-20,15,posd[lastPos]-10, TFT_BLACK);
+  tft.fillTriangle(5,posd[pos],5,posd[pos]-20,15,posd[pos]-10, TFT_ORANGE);
+  lastPos = pos;
+}
+
 void GDisplay::btConnected(boolean connect)
 {
   if (connect) {
@@ -228,4 +249,6 @@ void GDisplay::fz35Connected(boolean connect)
     tft.pushImage(80,280,40,40,fz35Off_40x40);
   }
 }
+
+
 

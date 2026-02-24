@@ -1,3 +1,20 @@
+/*
+   Copyright (C) 2026  by Stefan Andres (develop@andres-stefan.de)
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include <Arduino.h>
 
 #include "Logging.h"
@@ -8,7 +25,6 @@
 #include "INA219Handler.h"
 #include "FZ35Handler.h"
 #include "Display.h"
-#include "Ky040.h"
 
 
 GData Data;  // Global!!!
@@ -18,8 +34,6 @@ INA219Handler ina219;
 FZ35Handler fz35;
 
 BTHandler server;
-
-Ky040 ky(15,6,7);
 
 void setup()
 {
@@ -44,8 +58,6 @@ void setup()
    _logd("Start BLE Server <ESPTestBLE>...");
    server.start("ESPTestBLE");
 
-   ky.begin();
-   ky.activateRotaries();
 
 }
 
@@ -83,10 +95,11 @@ void loop()
         conected = false;
         _log("Client disconected");
       }
-    }
-    _log("Rotary: %d",ky.getRotaries());
+    } 
+    
   }
+  ina219.loop();
   fz35.loop();
-  if (ky.buttonPressed()) {_log("Pressed");}
+ 
 }
 

@@ -1,7 +1,24 @@
+/*
+   Copyright (C) 2026  by Stefan Andres (develop@andres-stefan.de)
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include "INA219Handler.h"
 
 
-#define TESTDATA_ON
+// #define TESTDATA_ON
 
 
 
@@ -17,26 +34,37 @@ void INA219Handler::begin()
     
     Wire.begin(SDA_PIN,SDC_PIN);
     ina219[0] = new INA219_WE(0x40);
-    ina219[0]->setShuntSizeInOhms(INAx40_RESISTOR);
+    ina219[0]->setShuntSizeInOhms(Data.getInaResistor(0));
     ina219[0]->setPGain(INA219_PG_320);
     ina219[0]->setBusRange(INA219_BRNG_32);
     ina219[0]->setMeasureMode(INA219_CONTINUOUS);
 
     ina219[1] = new INA219_WE(0x41);
-    ina219[1]->setShuntSizeInOhms(INAx41_RESISTOR);
+    ina219[1]->setShuntSizeInOhms(Data.getInaResistor(1));
     ina219[1]->setPGain(INA219_PG_320);
     ina219[1]->setBusRange(INA219_BRNG_32);
     ina219[1]->setMeasureMode(INA219_CONTINUOUS);
 
     if (!ina219[0]->init())
     {
-        _log("Failed to find INA219 chip fpr 0x40");
+        _loge("Failed to find INA219 chip fpr 0x40");
     }
     
      if (!ina219[1]->init())
     {
-        _log("Failed to find INA219 chip fpr 0x41");
+        _loge("Failed to find INA219 chip fpr 0x41");
     }
+
+    setupActive = false;
+    ky040.init(KY040_SW_PIN,KY040_CLK_PIN,KY040_DT_PIN);
+    ky040.begin();
+    
+}
+
+void INA219Handler::setResistors()
+{
+    ina219[0]->setShuntSizeInOhms(Data.getInaResistor(0));
+    ina219[1]->setShuntSizeInOhms(Data.getInaResistor(1));
 }
 
 int l;
@@ -115,8 +143,79 @@ void INA219Handler::updateData()
             state = state | API_STATE_INA_OVERFLOW;
         Data.setInaState(channel, state);
 
-        Display.updateVoltage(channel, voltage, state & API_STATE_INA_VOLTAGE);
-        Display.updateCurrent(channel, current, state & API_STATE_INA_CURRENT);
-        Display.updatePower(channel, power, state & API_STATE_INA_POWER);
+        if (!setupActive) {
+            Display.updateVoltage(channel, voltage, state & API_STATE_INA_VOLTAGE);
+            Display.updateCurrent(channel, current, state & API_STATE_INA_CURRENT);
+            Display.updatePower(channel, power, state & API_STATE_INA_POWER);
+        } 
     }
+}
+
+void INA219Handler::loop()
+{
+    int posn;
+    if (!setupActive) {
+        if (ky040.buttonPressed()) {
+            setupActive = true;
+            ky040.activateRotaries();
+            Display.drawSetup();
+            pos=0;
+            Display.activatePos(pos);
+            resistors[0] = Data.getInaResistor(0);
+            resistors[1] = Data.getInaResistor(1);
+            Display.drawSetupResistor(0,resistors[0],ina219[0]->getCurrent_mA()/1000.0F);
+            Display.drawSetupResistor(1,resistors[1],ina219[1]->getCurrent_mA()/1000.0F);
+        } 
+        return;
+    }
+
+
+    posn = ky040.getRotaries();
+    if (!changeResistor) { 
+        if ((posn > 0) && (pos < 3)) pos++;
+        if ((posn < 0) && (pos > 0)) pos--;
+        if (posn != 0) Display.activatePos(pos);
+    } else {
+        if (posn != 0 ) {
+            resistors[pos] += float(posn)/1000.0F;
+            ina219[pos]->setShuntSizeInOhms(resistors[pos]);
+            Display.drawSetupResistor(pos,resistors[pos],ina219[pos]->getCurrent_mA()/1000.0F,true);
+        }
+      
+        if (ky040.buttonPressed()) {
+            changeResistor = false;
+            Display.drawSetupResistor(pos,resistors[pos],ina219[pos]->getCurrent_mA()/1000.0F,false);
+            pos = 2;
+            Display.activatePos(pos);
+        } 
+    }
+
+   
+    if (ky040.buttonPressed()) {
+        switch(pos) {
+            case 0:
+            case 1:
+                changeResistor = true;
+                Display.drawSetupResistor(pos,resistors[pos],ina219[pos]->getCurrent_mA()/1000.0F,true);
+                break;
+            case 2: 
+                Data.setInaResistor(0,resistors[0]);
+                Data.setInaResistor(1,resistors[1]);
+                Data.save();
+                pos = 3;
+                Display.activatePos(pos);
+                break;
+            case 3:
+                setupActive = false;
+                setResistors();
+                ky040.deactivateRotaries();
+                Display.clear();
+                break;
+            default: // do nothing
+                break;
+        }
+            
+    }
+    
+
 }
