@@ -30,31 +30,35 @@ INA219Handler::INA219Handler()
 
 void INA219Handler::begin()
 {
-
-    
     Wire.begin(SDA_PIN,SDC_PIN);
+    Wire.setClock(10000);
+    _logd("Starting INA 0x40");
     ina219[0] = new INA219_WE(0x40);
+    if (!ina219[0]->init())
+    {
+        _loge("Failed to find INA219 chip fpr 0x40");
+    }
+    ina219[0]->reset_INA219();
     ina219[0]->setShuntSizeInOhms(Data.getInaResistor(0));
     ina219[0]->setPGain(INA219_PG_320);
     ina219[0]->setBusRange(INA219_BRNG_32);
     ina219[0]->setMeasureMode(INA219_CONTINUOUS);
-
+    _logd("Starting INA 0x41");
     ina219[1] = new INA219_WE(0x41);
+    if (!ina219[1]->init())
+    {
+        _loge("Failed to find INA219 chip fpr 0x41");
+    }
+
+
     ina219[1]->setShuntSizeInOhms(Data.getInaResistor(1));
     ina219[1]->setPGain(INA219_PG_320);
     ina219[1]->setBusRange(INA219_BRNG_32);
     ina219[1]->setMeasureMode(INA219_CONTINUOUS);
 
-    if (!ina219[0]->init())
-    {
-        _loge("Failed to find INA219 chip fpr 0x40");
-    }
     
-     if (!ina219[1]->init())
-    {
-        _loge("Failed to find INA219 chip fpr 0x41");
-    }
-
+    
+   
     setupActive = false;
     ky040.init(KY040_SW_PIN,KY040_CLK_PIN,KY040_DT_PIN);
     ky040.begin();
@@ -124,22 +128,23 @@ void INA219Handler::updateData()
         current = 4.1F;
         power = voltage * current;
 #else
-        voltage = ina219[0]->getBusVoltage_V();
-        current = ina219[0]->getCurrent_mA() / 1000.0;
-        power = ina219[0]->getBusPower() / 1000.0;
+        voltage = ina219[channel]->getBusVoltage_V();
+        current = ina219[channel]->getCurrent_mA() / 1000.0;
+        power = ina219[channel]->getBusPower() / 1000.0;
 
 #endif
 
         Data.setInaBusVoltage(channel, voltage);
         Data.setInaBusCurrent(channel, current);
         Data.setInaBusPower(channel, power);
+       // _logd("INA: #%d , Volage: %f, current: %f, power: %f",channel, voltage,current,power);
 
         state = 0;
         if (voltage >= 26.0)
             state = state | API_STATE_INA_VOLTAGE | API_STATE_INA_POWER;
         if (current >= 3.2)
             state = state | API_STATE_INA_CURRENT | API_STATE_INA_POWER;
-        if (ina219[0]->getOverflow())
+        if (ina219[channel]->getOverflow())
             state = state | API_STATE_INA_OVERFLOW;
         Data.setInaState(channel, state);
 

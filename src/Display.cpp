@@ -34,10 +34,10 @@ void GDisplay::begin()
 {   
     _logd("Display Begin");
     tft.init();
-    tft.setRotation(1);
+    tft.setRotation(3);
+    ina219isConneced = false;
+    fz35isConneced = false;
     clear();
-    fz35Connected(false);
-    btConnected(false);
     _logd("Display End Begin");
 }
 
@@ -120,7 +120,8 @@ void GDisplay::clear()
   tft.drawString("overflow",360,300,2);
   tft.pushImage(330,290,24,24,warningRed_24x24);
 
-  btConnected(false);
+  fz35Connected(fz35isConneced);
+  btConnected(ina219isConneced);
   
 }
 
@@ -235,8 +236,10 @@ void GDisplay::activatePos(uint8_t pos)
 void GDisplay::btConnected(boolean connect)
 {
   if (connect) {
+    fz35isConneced = true;
     tft.pushImage(20,280,40,40,btIconOn_40x40);
   } else {
+    fz35isConneced = false;
     tft.pushImage(20,280,40,40,btIconOff_40x40);
   }
 }
@@ -244,8 +247,10 @@ void GDisplay::btConnected(boolean connect)
 void GDisplay::fz35Connected(boolean connect)
 {
   if (connect) {
+    ina219isConneced = true;
     tft.pushImage(80,280,40,40,fz35On_40x40);
   } else {
+    ina219isConneced = false;
     tft.pushImage(80,280,40,40,fz35Off_40x40);
   }
 }

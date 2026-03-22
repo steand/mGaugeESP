@@ -37,6 +37,8 @@ private:
    void printValue(int x, int y, float value, int font);
 
    uint8_t lastPos;
+   boolean fz35isConneced;
+   boolean ina219isConneced;
    
   
    

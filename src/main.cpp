@@ -39,6 +39,7 @@ void setup()
 {
 
   _log_begin(115200);  
+  delay(3000); // Wait if Powered by 5V.
    pinMode(LED_BUILTIN, OUTPUT);
    digitalWrite(LED_BUILTIN, LOW);  // On Board RGB-LED off
 

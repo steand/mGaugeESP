@@ -27,11 +27,11 @@
 #include "Display.h"  //global
 
 #define I2C_FREQ 400000
-#define SDA_PIN 2
-#define SDC_PIN 1
+#define SDA_PIN 1
+#define SDC_PIN 2
 
-#define KY040_SW_PIN  15
-#define KY040_CLK_PIN 6
+#define KY040_SW_PIN  6
+#define KY040_CLK_PIN 15
 #define KY040_DT_PIN 7
 
 

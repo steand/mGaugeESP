@@ -24,6 +24,7 @@
 void FZ35Handler::begin()
 {
     fxSerial.begin(9600,SERIAL_8N1, FZ35_RxT_PIN, FZ35_TxT_PIN);
+    // pinMode(5,INPUT);
     voltage =5.5;
     current =2.0;
     capacity = 0.0;
@@ -34,11 +35,13 @@ void FZ35Handler::begin()
 void FZ35Handler::start()
 {
      fxSerial.print("start\r\n");
+     _log("FZ35 Started");
 }
 
 void FZ35Handler::stop()
 {
     fxSerial.print("stop\r\n");
+    _log("FZ35 Stoped");
 }
 
 
@@ -55,6 +58,7 @@ void FZ35Handler::loop()
     {
 
         ch = fxSerial.read();
+       //  _logd("FZ35 char : %d = %c", ch, ch);
 
         switch (ch)
         {
@@ -62,7 +66,7 @@ void FZ35Handler::loop()
             pos = 0;
             break;
         case 13:
-            // _logd("Fz35 data: %s", inStr.c_str());
+             _logd("Fz35 data: %s", inStr.c_str());
             switch (pos)
             {
             case 0:

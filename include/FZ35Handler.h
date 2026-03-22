@@ -21,8 +21,8 @@
 #include <HardwareSerial.h>
 #include <Data.h>
 
-#define FZ35_RxT_PIN 4
-#define FZ35_TxT_PIN 5
+#define FZ35_RxT_PIN 5
+#define FZ35_TxT_PIN 4
 
 
 class FZ35Handler

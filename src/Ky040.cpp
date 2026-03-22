@@ -56,14 +56,17 @@ void Ky040::begin()
 boolean Ky040::buttonPressed()
 {      
     if (button) {
-        if (millis() - waitPressed < 1000 ) { // debounce for 1 sec. 
+        if (millis() - waitPressed < 250 ) { // debounce for 250 msec. 
            button = false; 
            return false;
         }
         _logd("Button pressed");
         button = false;
         waitPressed = millis();
-        return true;
+        if (digitalRead(swPin) == LOW) {  // already pressed after 250 msec.
+            _logd("Button pressed");
+            return true;
+        } 
     }
     return false;
     
